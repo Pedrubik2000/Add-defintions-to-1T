@@ -34,6 +34,7 @@ def load_dictionary(dictionary):
             ]  # Using headword as key for finding the dictionary entry
     return output_map
 
+
 def load_dictionaryReadings(dictionary):
     output_mapReadings = {}
     archive = zipfile.ZipFile(dictionary, "r")
@@ -55,6 +56,7 @@ def load_dictionaryReadings(dictionary):
             ]  # Using headword as key for finding the dictionary entry
     return output_mapReadings
 
+
 def setup():
     global dictionary_map
     global dictionarReading_map
@@ -65,6 +67,7 @@ def setup():
         str(Path(SCRIPT_DIR, "dictionaries", "jmdict_english.zip"))
     )
 
+
 setup()
 
 config = mw.addonManager.getConfig(__name__)
@@ -74,8 +77,10 @@ source_field = config["source field"]
 destination_field = config["destination field"]
 tag = config["tag"]
 
+
 def addDefinitionToCardsWrapper():
     addDefinitionToCards(source_field, destination_field, tag, max_number)
+
 
 def addDefinitionToCards(source_field, destination_field, tag, max_number):
     cards = mw.col.findCards(f"tag:{tag}")
@@ -85,11 +90,12 @@ def addDefinitionToCards(source_field, destination_field, tag, max_number):
         card = mw.col.getCard(id)
         note = card.note()
         source_text = note[source_field]
-        result_def = look_up(source_text,max_number)
+        result_def = look_up(source_text, max_number)
         if result_def == None:
             result_def = ""
         note[destination_field] = result_def
         note.flush()
+
 
 action = QAction(f"Add definition to {destination_field}", mw)
 mw.form.menuTools.addAction(action)
@@ -122,14 +128,12 @@ def look_up(word, nb_definitions):
         dictionary_option = dictionarReading_map
         if word not in dictionarReading_map:
             return None
-        
-    
     result = [
         {
             "headword": entry[0],
             "reading": entry[1],
             "tags": entry[2],
-            "glossary_list":  wrapperComplexContentToHtml(entry[5]),
+            "glossary_list": wrapperComplexContentToHtml(entry[5]),
             "sequence": entry[6],
         }
         for entry in dictionary_option[word]
@@ -139,26 +143,29 @@ def look_up(word, nb_definitions):
         definitionTemplate = "<li><br>"
         definitionTemplate += f"{definition['reading']} 【{definition['headword']}】<br>"
         definitionTemplate += f"{definition['tags']}<br>"
-        if type(definition["glossary_list"]) is list:
-            print(definition)
-            print( type(definition["glossary_list"]))
-            print( definition["glossary_list"])
-            if type(definition["glossary_list"][0]) is list:
-                print(definition["glossary_list"][0][0])
-                definitions += definitionTemplate + definition["glossary_list"][0][0] + "</li><br>"
+        if definition["glossary_list"]:
+            if type(definition["glossary_list"]) is list:
+                if type(definition["glossary_list"][0]) is list:
+                    definitions += (
+                        definitionTemplate
+                        + definition["glossary_list"][0][0]
+                        + "</li><br>"
+                    )
+                else:
+                    for item in definition["glossary_list"]:
+                        if type(item) is str:
+                            definitions += definitionTemplate + item + "</li><br>"
             else:
-                for item in definition["glossary_list"]:
-                    if type(item) is str:
-                        definitions += definitionTemplate + item + "</li><br>"
-        else:
-            print(definition["glossary_list"])
-            definitions += definitionTemplate + definition["glossary_list"] + "</li><br>"
+                definitions += (
+                    definitionTemplate + definition["glossary_list"] + "</li><br>"
+                )
     return definitions
 
-def insertTags(tag,list):
-        list.insert(0,f"<{tag}>")
-        list.append(f"</{tag}>")
-        
+
+def insertTags(tag, list):
+    list.insert(0, f"<{tag}>")
+    list.append(f"</{tag}>")
+
 def contentToHtml(contentElement):
     content = contentElement.get("content")
     htmlOutput = []
@@ -176,21 +183,24 @@ def complexContentToHtml(dictList):
                     for li in contentItem["content"]:
                         li = contentToHtml(li)
                         htmlOutput.append(li)
-                        
+
                 elif type(contentItem["content"]) is dict:
                     li = contentItem["content"]
                     li = contentToHtml(li)
                     htmlOutput.append(li)
     return htmlOutput
 
+
 def wrapperComplexContentToHtml(textOrDict):
-    if type(textOrDict) is list:   
-        wrapperComplexContentToHtml(textOrDict[0])
+    if type(textOrDict) is list:
+        return wrapperComplexContentToHtml(textOrDict[0])
     if type(textOrDict) is dict:
         return complexContentToHtml(textOrDict["content"])
     return textOrDict
 
-tagsReplacements = { "n": "Common Noun"}
+
+tagsReplacements = {"n": "Common Noun"}
+
 
 def abreviationsToFullText(tags):
     tags = tags.split(" ")
@@ -199,10 +209,11 @@ def abreviationsToFullText(tags):
         tagReplacement = tagsReplacements.get(tag)
         if tagReplacement:
             tags[index] = tagReplacement
-    
+
     return "".join(tags)
+
 
 listest = "まあ 両方 似る 集まる 奇遇 キャラクター まかせる 頷く"
 for word in listest.split(" "):
     print(f"Looking up: {word}")
-    print(look_up(word,10))
+    print(look_up(word, 10))
