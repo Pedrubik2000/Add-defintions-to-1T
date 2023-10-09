@@ -16,7 +16,7 @@ Just click in Tools and click add definitions to glossary.
 "max number of definitions": 10,
 "source field": "Word",
 "destination field": "Glossary",
-"tag": "1T"
+"search": "-tag:mm_alreadyKnown tag:1T"
 }
 ```
 
