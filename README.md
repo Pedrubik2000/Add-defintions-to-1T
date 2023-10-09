@@ -1,6 +1,6 @@
 # Add-definitions-to-1T
 
-This is an addon for Anki that I make because I wanted to add JMDICT definitions to every card with a "1T" tag.
+This is an addon for Anki that I made because I wanted to add JMDICT definitions to every card with a "1T" tag.
 It's intended to use with [Animecards](https://ankiweb.net/shared/info/151553357) and [MorphMan](https://ankiweb.net/shared/info/900801631).
 
 ## How to use
