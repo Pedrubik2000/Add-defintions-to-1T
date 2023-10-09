@@ -69,45 +69,19 @@ def setup():
 
 
 setup()
-
 config = mw.addonManager.getConfig(__name__)
 
 max_number = config["max number of definitions"]
 source_field = config["source field"]
 destination_field = config["destination field"]
-tag = config["tag"]
-
-
-def addDefinitionToCardsWrapper():
-    addDefinitionToCards(source_field, destination_field, tag, max_number)
-
-
-def addDefinitionToCards(source_field, destination_field, tag, max_number):
-    cards = mw.col.findCards(f"tag:{tag}")
-    showInfo("Card count: %d" % len(cards))
-
-    for id in cards:
-        card = mw.col.getCard(id)
-        note = card.note()
-        source_text = note[source_field]
-        result_def = look_up(source_text, max_number)
-        if result_def == None:
-            result_def = ""
-        note[destination_field] = result_def
-        note.flush()
-
-
-action = QAction(f"Add definition to {destination_field}", mw)
-mw.form.menuTools.addAction(action)
-action.triggered.connect(addDefinitionToCardsWrapper)
-
+search = config["search"]
 
 def addDefinitionToCardsWrapper():
-    addDefinitionToCards(source_field, destination_field, tag, max_number)
+    addDefinitionToCards(source_field, destination_field, search, max_number)
 
 
-def addDefinitionToCards(source_field, destination_field, tag, max_number):
-    cards = mw.col.findCards(f"-tag:mm_alreadyKnown tag:{tag}")
+def addDefinitionToCards(source_field, destination_field, search, max_number):
+    cards = mw.col.findCards(f"{search}")
     showInfo("Card count: %d" % len(cards))
 
     for id in cards:
@@ -212,6 +186,9 @@ def abreviationsToFullText(tags):
 
     return "".join(tags)
 
+action = QAction(f"Add definition to {destination_field}", mw)
+mw.form.menuTools.addAction(action)
+action.triggered.connect(addDefinitionToCardsWrapper)
 
 listest = "まあ 両方 似る 集まる 奇遇 キャラクター まかせる 頷く"
 for word in listest.split(" "):
