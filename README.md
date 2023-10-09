@@ -21,4 +21,4 @@ Just click in Tools and click add definitions to glossary.
 ```
 
 They are self-explanatory.
-Change tag if you have another tag for 1T cards.
+Change search for another [search](https://docs.ankiweb.net/searching.html) you want.
